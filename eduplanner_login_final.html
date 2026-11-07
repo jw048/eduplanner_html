@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduPlanner — Don't Panic, Just Plan It!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --teal-deep:#16626b;
+      --teal:#1d8a93;
+      --teal-bright:#23a6ad;
+      --teal-pale:#9fd4d3;
+      --teal-mist:#cfe6e3;
+      --slate:#2b3a42;
+      --ink:#1a2329;
+      --paper:#fbfaf6;
+      --gold:#c9a24b;
+      --gold-deep:#9a7426;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:48px 20px;
+      font-family:'Archivo',sans-serif;
+      /* wood-grain desk */
+      background-color:#b9905c;
+      background-image:
+        repeating-linear-gradient(91deg,
+          rgba(120,82,42,0)   0px,
+          rgba(120,82,42,.10) 2px,
+          rgba(160,118,68,0)  5px,
+          rgba(90,58,28,.12)  9px,
+          rgba(150,108,60,0)  14px),
+        repeating-linear-gradient(89deg,
+          rgba(255,235,200,.06) 0px,
+          rgba(255,235,200,0)   40px,
+          rgba(80,50,22,.05)    80px),
+        linear-gradient(115deg,#c79a62 0%,#aa7f4c 40%,#bd9159 70%,#9e7444 100%);
+      overflow-x:hidden;
+    }
+
+    /* ---------- THE PLANNER ---------- */
+    .planner{
+      position:relative;
+      width:min(560px,100%);
+      aspect-ratio:9/7.6;
+      margin-top:26px;
+      filter:drop-shadow(0 30px 45px rgba(40,24,8,.45));
+      animation:rise .9s cubic-bezier(.2,.8,.25,1) both;
+    }
+    @keyframes rise{from{opacity:0;transform:translateY(26px) rotate(-.6deg);}to{opacity:1;transform:none;}}
+
+    /* dark backing board peeking at the top under the rings */
+    .backboard{
+      position:absolute;
+      top:-4px;left:8px;right:8px;bottom:14px;
+      background:linear-gradient(180deg,#222d33,#1a2329);
+      border-radius:18px;
+    }
+
+    /* faceted teal cover */
+    .cover{
+      position:absolute;
+      inset:18px 0 0 0;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:inset 0 2px 0 rgba(255,255,255,.18),
+                inset 0 -22px 40px rgba(0,40,42,.35);
+    }
+    .cover svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+
+    /* ---------- SPIRAL RINGS ---------- */
+    .spiral{
+      position:absolute;
+      top:-22px;left:0;right:0;
+      height:48px;
+      display:flex;
+      justify-content:space-evenly;
+      align-items:flex-start;
+      padding:0 26px;
+      z-index:5;
+    }
+    .ring{
+      width:30px;height:46px;
+      border-radius:50%;
+      background:
+        linear-gradient(180deg,#f3dea0 0%,var(--gold) 34%,var(--gold-deep) 60%,#5c4416 100%);
+      box-shadow:
+        0 2px 3px rgba(0,0,0,.4),
+        inset 0 -3px 4px rgba(0,0,0,.35),
+        inset 0 2px 2px rgba(255,255,255,.6);
+      position:relative;
+    }
+    .ring::after{ /* the hole the ring loops through */
+      content:"";
+      position:absolute;
+      left:50%;top:30px;
+      width:9px;height:9px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:#11181c;
+      box-shadow:inset 0 1px 2px rgba(0,0,0,.8);
+    }
+
+    /* ---------- HEADLINE ---------- */
+    .brand{
+      position:absolute;
+      top:13%;left:9%;
+      z-index:4;
+      color:var(--paper);
+      text-shadow:0 2px 5px rgba(0,30,32,.5);
+    }
+    .brand h1{
+      font-size:clamp(20px,4.4vw,30px);
+      font-weight:800;
+      letter-spacing:-.5px;
+      line-height:1.18;
+    }
+    .brand .tag{
+      font-family:'Caveat',cursive;
+      font-size:clamp(20px,4.8vw,30px);
+      font-weight:700;
+      color:#ffe7a8;
+      display:block;
+      margin-top:2px;
+      transform:rotate(-2deg);
+    }
+
+    /* ---------- LOGIN FORM ---------- */
+    .login{
+      position:absolute;
+      right:6%;bottom:13%;
+      width:54%;
+      z-index:4;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .field{position:relative;}
+    .field input{
+      width:100%;
+      padding:13px 15px;
+      font-family:'Archivo',sans-serif;
+      font-size:15px;
+      color:var(--ink);
+      background:var(--paper);
+      border:none;
+      border-radius:5px;
+      box-shadow:0 4px 0 rgba(0,40,42,.28),
+                inset 0 1px 0 rgba(255,255,255,.9);
+      outline:none;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .field input::placeholder{color:#8b9aa0;font-weight:500;}
+    .field input:focus{
+      transform:translateY(-2px);
+      box-shadow:0 6px 0 var(--gold-deep),
+                inset 0 1px 0 rgba(255,255,255,.9);
+    }
+
+    .signin{
+      margin-top:4px;
+      padding:13px;
+      font-family:'Archivo',sans-serif;
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      color:#fff;
+      background:linear-gradient(180deg,#2a3c44,#1a2329);
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      box-shadow:0 4px 0 #0c1216;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .signin:hover{background:linear-gradient(180deg,#34484f,#212e34);}
+    .signin:active{transform:translateY(4px);box-shadow:0 0 0 #0c1216;}
+
+    .helper{
+      text-align:center;
+      margin-top:6px;
+      font-family:'Caveat',cursive;
+      font-size:18px;
+      color:#fff7e0;
+    }
+    .helper a{color:#fff;text-decoration:underline dotted;}
+
+    /* handwritten arrow annotation pointing at the form */
+    .annotation{
+      position:absolute;
+      right:-6px;bottom:30%;
+      transform:translateX(100%) rotate(-4deg);
+      font-family:'Caveat',cursive;
+      font-size:clamp(16px,3.6vw,22px);
+      font-weight:700;
+      color:#3c2c12;
+      white-space:nowrap;
+      z-index:6;
+    }
+    .annotation svg{vertical-align:middle;margin-right:4px;}
+
+    @media (max-width:600px){
+      .annotation{display:none;}
+      .brand{top:11%;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="planner">
+    <div class="backboard"></div>
+
+    <div class="cover">
+      <!-- faceted teal geometry, echoing the mockup -->
+      <svg viewBox="0 0 100 84" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#23a6ad"/><stop offset="1" stop-color="#16626b"/>
+          </linearGradient>
+        </defs>
+        <rect width="100" height="84" fill="url(#g1)"/>
+        <polygon points="0,0 46,0 0,40"   fill="#1d8a93"/>
+        <polygon points="46,0 100,0 100,22 62,34" fill="#16626b"/>
+        <polygon points="0,40 0,84 30,84" fill="#23a6ad"/>
+        <polygon points="0,40 30,84 58,46 28,30" fill="#cfe6e3" opacity=".9"/>
+        <polygon points="28,30 58,46 70,18 46,0 0,0 0,40" fill="#9fd4d3" opacity=".55"/>
+        <polygon points="62,34 100,22 100,58 74,52" fill="#1d8a93"/>
+        <polygon points="74,52 100,58 100,84 60,84 58,46" fill="#16626b"/>
+        <polygon points="58,46 60,84 30,84" fill="#2b3a42" opacity=".25"/>
+        <polygon points="84,84 100,68 100,84" fill="#e8efed"/>
+      </svg>
+    </div>
+
+    <!-- spiral rings -->
+    <div class="spiral">
+      <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+      <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+      <span class="ring"></span><span class="ring"></span>
+    </div>
+
+    <!-- headline -->
+    <div class="brand">
+      <h1>EduPlanner</h1>
+      <span class="tag">Don't Panic, Just Plan It!</span>
+    </div>
+
+    <!-- login -->
+    <form class="login" method="post">
+      <div class="field">
+        <input type="text" placeholder="Username or email" autocomplete="username" id="username" name="username">
+      </div>
+      <div class="field">
+        <input type="passcode" placeholder="Passcode" autocomplete="current-password" id="passcode" name="passcode">
+      </div>
+      <button class="signin" type="submit">Sign In</button>
+      <p class="helper"><a href="#">Forgot password?</a><a href="#">Create account</a></p>
+    </form>
+
+    <!-- JavaScript -->
+    <script>
+      document.querySelector('.login').addEventListener('submit', async (event) => {
+        event.preventDefault(); //prevent form from reloading the page
+        
+        const username = document.getElementById('username').value;
+        const passcode = document.getElementById('passcode').value;
+
+        
+        const response = await fetch(`https://44.215.161.145/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: username,
+            passcode: passcode
+          })
+        });
+
+        if (response.ok) { //if http response status is 200-299
+          const loginResult = await response.json();
+          if (loginResult === "false") { //if username/passcode is invalid
+            alert('Invalid username or passcode. Please try again.');
+          } else {
+            alert('Login Success.');
+            const name = loginResult[0].student_name; 
+            localStorage.setItem("user_name", name);
+            window.location.href = './academicair.html'; //redirect to the student home page
+            // // const destination = new URL('./academicair.html', window.location.href);
+            // // console.log('Redirecting to:', destination.href);
+            // window.location.href = destination.href;
+          } 
+        } else {
+          alert('Login request failed. Please try again.');
+        }
+      });
+    </script>
+
+    <!-- handwritten annotation -->
+    <div class="annotation">
+      <svg width="34" height="14" viewBox="0 0 34 14"><path d="M33 7H4M4 7l6-5M4 7l6 5" stroke="#3c2c12" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Open Your Planner!
+    </div>
+  </div>
+
+</body>
+</html>

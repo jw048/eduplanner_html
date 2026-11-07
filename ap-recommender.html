@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AP Course Recommender</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== Animated angle for the glow border ===== */
+  @property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  :root {
+    --bg: #0e0f13;
+    --panel: #16181d;
+    --line: #2a2d35;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+    --gemini: conic-gradient(from var(--angle),
+      #4285f4, #9b72cb, #d96570, #f9ab00, #d96570, #9b72cb, #4285f4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== Gemini-style screen-edge glow ===== */
+  .edge-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 18px;
+    padding: 3px;                       /* border thickness */
+    background: var(--gemini);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: spin 6s linear infinite;
+  }
+  .edge-glow.blur {
+    filter: blur(22px);
+    padding: 10px;
+    opacity: .75;
+  }
+  @keyframes spin { to { --angle: 360deg; } }
+
+  /* ===== Layout ===== */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 72px 24px 96px;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; margin-bottom: 20px;
+  }
+  .badge .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, #4285f4, #d96570);
+  }
+
+  h1 {
+    font-size: 44px; font-weight: 600; letter-spacing: -0.02em;
+    line-height: 1.15; margin-bottom: 12px;
+  }
+  h1 .grad {
+    background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--muted); font-size: 16px; margin-bottom: 40px; }
+
+  .label { font-size: 13px; color: var(--muted); margin: 28px 0 12px; text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ===== Grade toggle ===== */
+  .toggle {
+    display: inline-flex; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px;
+  }
+  .toggle button {
+    border: 0; background: none; color: var(--muted);
+    font: inherit; font-size: 14px; padding: 8px 22px; border-radius: 999px; cursor: pointer;
+  }
+  .toggle button.active { background: #2b2f38; color: var(--text); }
+
+  /* ===== Major chips ===== */
+  .majors { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    font: inherit; font-size: 14px; padding: 10px 16px; border-radius: 12px;
+    cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .chip:hover { border-color: #4a4f5a; }
+  .chip.active { border-color: transparent; background:
+      linear-gradient(var(--panel), var(--panel)) padding-box,
+      linear-gradient(90deg, #4285f4, #9b72cb, #d96570) border-box;
+    border: 1px solid transparent; }
+
+  /* ===== Prompt-style input box with its own glow ===== */
+  .ask {
+    position: relative; margin-top: 36px; border-radius: 20px;
+  }
+  .ask::before {
+    content: ""; position: absolute; inset: -1px; border-radius: 21px;
+    background: var(--gemini); animation: spin 6s linear infinite; z-index: 0;
+  }
+  .ask-inner {
+    position: relative; z-index: 1; display: flex; align-items: center; gap: 12px;
+    background: var(--panel); border-radius: 20px; padding: 14px 14px 14px 20px;
+  }
+  .ask-inner span { flex: 1; color: var(--muted); font-size: 15px; }
+  .ask-inner span b { color: var(--text); font-weight: 500; }
+  .go {
+    border: 0; cursor: pointer; font: inherit; font-weight: 600; font-size: 14px;
+    color: #fff; padding: 10px 20px; border-radius: 12px;
+    background: linear-gradient(90deg, #4285f4, #9b72cb);
+  }
+  .go:disabled { opacity: .4; cursor: default; }
+
+  /* ===== Results ===== */
+  #results { margin-top: 40px; display: grid; gap: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
+    opacity: 0; transform: translateY(8px); animation: rise .4s forwards;
+  }
+  .card h3 { font-size: 16px; font-weight: 500; }
+  .card p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .pct { font-size: 14px; font-weight: 600; color: #8ab4f8; white-space: nowrap; }
+  .bar { height: 4px; border-radius: 4px; background: #2b2f38; margin-top: 10px; overflow: hidden; width: 220px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, #4285f4, #d96570); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  .shimmer {
+    height: 74px; border-radius: 16px;
+    background: linear-gradient(90deg, #1b1d23 25%, #262933 50%, #1b1d23 75%);
+    background-size: 200% 100%; animation: sh 1.2s infinite;
+  }
+  @keyframes sh { to { background-position: -200% 0; } }
+
+  footer { margin-top: 56px; font-size: 12px; color: #5f6368; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- Gemini-style edge glow (sharp line + soft blur) -->
+<div class="edge-glow blur"></div>
+<div class="edge-glow"></div>
+
+<main>
+  <div class="badge"><span class="dot"></span> AI Mode · AP Course Recommender</div>
+  <h1>Find your next <span class="grad">AP courses</span></h1>
+  <p class="sub">Pick your grade and intended major — we'll suggest the APs students like you actually took.</p>
+
+  <div class="label">Grade</div>
+  <div class="toggle" id="grade">
+    <button data-grade="10" class="active">10th</button>
+    <button data-grade="11">11th</button>
+  </div>
+
+  <div class="label">Intended Major</div>
+  <div class="majors" id="majors"></div>
+
+  <div class="ask">
+    <div class="ask-inner">
+      <span id="summary">Select a major to get recommendations</span>
+      <button class="go" id="go" disabled>Recommend ✦</button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+  <footer>Based on real course data · Decision Tree model</footer>
+</main>
+
+<script>
+  // ===== Config =====
+  const API_URL = ""; // e.g. "https://xxxx.ngrok-free.app/recommend" (FastAPI). Empty = mock data.
+
+  const MAJORS = ["Pre-Med / Biology", "Computer Science", "Engineering", "Business",
+                  "Psychology", "Economics", "Political Science", "English / Humanities"];
+
+  // ===== Mock data (used when API_URL is empty) =====
+  const MOCK = {
+    "Pre-Med / Biology": ["AP Biology", "AP Chemistry", "AP Calculus AB", "AP Psychology"],
+    "Computer Science":  ["AP Computer Science A", "AP Calculus BC", "AP Physics 1", "AP Statistics"],
+    "Engineering":       ["AP Physics C: Mechanics", "AP Calculus BC", "AP Chemistry", "AP CS Principles"],
+    "Business":          ["AP Macroeconomics", "AP Microeconomics", "AP Statistics", "AP Lang"],
+  };
+  const FALLBACK = ["AP English Language", "AP U.S. History", "AP Statistics", "AP Psychology"];
+
+  // ===== State =====
+  let grade = "10", major = null;
+
+  // ===== Render majors =====
+  const majorsEl = document.getElementById("majors");
+  MAJORS.forEach(m => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = m;
+    b.onclick = () => {
+      major = m;
+      document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === b));
+      update();
+    };
+    majorsEl.appendChild(b);
+  });
+
+  // ===== Grade toggle =====
+  document.querySelectorAll("#grade button").forEach(b => {
+    b.onclick = () => {
+      grade = b.dataset.grade;
+      document.querySelectorAll("#grade button").forEach(x => x.classList.toggle("active", x === b));
+      update();
+    };
+  });
+
+  function update() {
+    document.getElementById("summary").innerHTML = major
+      ? `Recommend APs for a <b>${grade}th grader</b> interested in <b>${major}</b>`
+      : "Select a major to get recommendations";
+    document.getElementById("go").disabled = !major;
+  }
+
+  // ===== Fetch recommendations =====
+  async function getRecs() {
+    if (API_URL) {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grade, major })
+      });
+      return (await res.json()).recommendations; // expected: [{course, score}]
+    }
+    await new Promise(r => setTimeout(r, 900));
+    return (MOCK[major] || FALLBACK).map((c, i) => ({ course: c, score: 92 - i * 9 }));
+  }
+
+  document.getElementById("go").onclick = async () => {
+    const out = document.getElementById("results");
+    out.innerHTML = '<div class="shimmer"></div>'.repeat(3);
+    const recs = await getRecs();
+    out.innerHTML = recs.map((r, i) => `
+      <div class="card" style="animation-delay:${i * 80}ms">
+        <div>
+          <h3>${r.course}</h3>
+          <p>Taken by ${r.score}% of ${major} students in grade ${grade}</p>
+          <div class="bar"><i style="width:${r.score}%"></i></div>
+        </div>
+        <div class="pct">#${i + 1}</div>
+      </div>`).join("");
+  };
+</script>
+</body>
+</html>

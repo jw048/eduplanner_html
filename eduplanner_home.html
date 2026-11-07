@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcademicAir</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1f1f1f;
+    --card: #2a2a2a;
+    --card-inner: #262626;
+    --border: #3a3a3a;
+    --text: #f2f2f2;
+    --muted: #b5b5b5;
+    --hero: #1e4f8f;
+    --blue: #4a7fe0;
+    --green: #6b9a2e;
+    --orange: #c47a2c;
+    --purple: #8254ab;
+    --red: #d64545;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 24px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #1a4685, var(--hero));
+    border-radius: 14px;
+    padding: 56px 56px 44px;
+    overflow: hidden;
+  }
+  .brand { position: absolute; top: 16px; left: 56px; color: #8fb0e0; font-weight: 600; }
+  .boarding {
+    position: absolute; top: 16px; right: 50px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px; padding: 8px 22px; text-align: center;
+  }
+  .boarding small { display: block; font-size: 12px; letter-spacing: 2px; color: #a8c3ea; }
+  .boarding span { font-size: 20px; font-weight: 600; color: #e6efff; }
+  .eyebrow { margin-top: 36px; font-size: 14px; letter-spacing: 2px; color: #a8c3ea; font-weight: 500; }
+  .hero h1 { font-size: 42px; line-height: 1.2; margin: 14px 0 12px; }
+  .hero p { color: #d6e3f7; font-size: 18px; }
+  .hero-plane { position: absolute; right: 56px; bottom: 50px; width: 90px; height: 90px; color: #5c95f0; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    margin: 40px 0 20px;
+    font-size: 16px; letter-spacing: 2px; color: #d0d0d0; font-weight: 500;
+  }
+
+  /* ===== BOARDING PASSES ===== */
+  .passes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .pass {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 20px 0;
+    display: flex; flex-direction: column;
+  }
+  .pass-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .code {
+    font-size: 15px; font-weight: 600; letter-spacing: 1px;
+    padding: 6px 14px; border-radius: 6px;
+  }
+  .gate { text-align: right; font-size: 15px; color: var(--muted); }
+  .gate b { display: block; font-size: 20px; color: var(--text); }
+  .route { display: flex; align-items: center; gap: 12px; margin: 26px 0 22px; }
+  .route span { font-size: 34px; font-weight: 600; }
+  .route .line { flex: 1; height: 1px; background: #555; position: relative; }
+  .route .line svg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background: var(--card); }
+  .pass h3 { font-size: 20px; margin-bottom: 6px; }
+  .pass p { color: var(--muted); font-size: 16px; line-height: 1.4; }
+  .pass-foot {
+    margin-top: auto; padding: 22px 0;
+    border-top: 1px dashed #4a4a4a; margin-top: 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted); font-size: 16px;
+  }
+  .pass-foot a { text-decoration: none; font-weight: 600; font-size: 18px; white-space: nowrap; }
+
+  .blue  { color: var(--blue); }
+  .green { color: var(--green); }
+  .orange{ color: var(--orange); }
+  .purple{ color: var(--purple); }
+  .c-blue   { background: #e8f0ff; color: #2b5cb8; }
+  .c-green  { background: #edf6e1; color: #4d6e1f; }
+  .c-orange { background: #fbefe0; color: #9a5a17; }
+  .c-purple { background: #fef0fb; color: #38204f; }
+
+  /* ===== ROADMAP ===== */
+  .roadmap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+  }
+  .roadmap-head { display: flex; justify-content: space-between; align-items: center; }
+  .roadmap-head h2 { font-size: 22px; display: flex; align-items: center; gap: 10px; }
+  .roadmap-head h2 svg { width: 22px; height: 22px; color: var(--blue); }
+  .roadmap-head small { color: #cfcfcf; font-size: 16px; }
+
+  .stops { display: flex; justify-content: space-between; margin: 40px 0 36px; }
+  .stop { flex: 1; text-align: center; position: relative; }
+  .stop:not(:last-child)::after {
+    content: ''; position: absolute; top: 30px; left: calc(50% + 50px);
+    width: calc(100% - 100px); height: 2px; background: #555;
+  }
+  .stop.done:not(:last-child)::after { background: #2d5aa8; }
+  .dot {
+    width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #666; color: #ccc; position: relative; z-index: 1;
+    background: var(--card);
+  }
+  .dot svg { width: 22px; height: 22px; }
+  .stop.done .dot { background: #234a8c; border-color: #234a8c; color: #fff; }
+  .stop.now .dot { background: #e8f0ff; border-color: #4a7fe0; border-width: 3px; color: #2b5cb8; }
+  .stop b { display: block; font-size: 17px; }
+  .stop span { font-size: 15px; color: var(--muted); }
+  .stop.now span { color: var(--blue); }
+
+  /* ===== STATS ===== */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat { background: var(--card-inner); background: #313131; border-radius: 10px; padding: 22px; }
+  .stat small { color: #d0d0d0; font-size: 16px; }
+  .stat .num { font-size: 32px; font-weight: 600; margin: 8px 0 4px; }
+  .stat span { color: #c0c0c0; font-size: 15px; }
+
+
+  /* ===== VIEWS ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+  .back { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font: inherit; margin-bottom: 20px; }
+  .back:hover { color: var(--text); }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 32px; }
+  .panel h2 { font-size: 26px; margin-bottom: 6px; }
+  .panel > p { color: var(--muted); margin-bottom: 24px; }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .row input, .row select { flex: 1; background: #313131; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font: inherit; }
+  .btn { background: var(--blue); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 600; }
+  .btn.del { background: #444; padding: 10px 14px; }
+  .result { margin-top: 24px; font-size: 20px; }
+  .result b { font-size: 36px; }
+  ul.list { list-style: none; margin-top: 16px; }
+  ul.list li { display: flex; justify-content: space-between; align-items: center; background: #313131; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; }
+  ul.list li.done span { text-decoration: line-through; color: var(--muted); }
+
+  @media (max-width: 860px) {
+    .passes, .stats { grid-template-columns: 1fr; }
+    .stops { flex-wrap: wrap; gap: 20px; }
+    .stop { flex: 0 0 30%; }
+    .stop::after { display: none; }
+    .hero-plane { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="home" class="view">
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="brand">✈ AcademicAir</div>
+    <div class="boarding"><small>BOARDING</small><span>Now Open</span></div>
+    <div class="eyebrow">STUDENT MANAGEMENT SYSTEM</div>
+    <h1>Welcome aboard,<br>Passenger.</h1>
+    <p>Your academic journey starts at the gate.</p>
+    <svg class="hero-plane" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+    </svg>
+  </section>
+
+  <!-- ===== BOARDING PASSES ===== -->
+  <div class="section-title">YOUR BOARDING PASSES — SELECT A DESTINATION</div>
+  <div class="passes">
+
+    <div class="pass">
+      <div class="pass-top"><div class="code c-blue">GPA-101</div><div class="gate">Gate<b>A1</b></div></div>
+      <div class="route blue"><span>YOU</span><div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><span>GPA</span></div>
+      <h3>GPA Calculator</h3>
+      <p>Enter grades &amp; credits — see your GPA instantly</p>
+      <div class="pass-foot">Economy · Unlimited recalc <a href="#gpa" class="blue">Board →</a></div>
+    </div>
+
+    <div class="pass">
+      <div class="pass-top"><div class="code c-green">CSE-202</div><div class="gate">Gate<b>B3</b></div></div>
+      <div class="route green"><span>YOU</span><div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><span>CRS</span></div>
+      <h3>Course Selection</h3>
+      <p>Plan your semester — pick routes &amp; schedule</p>
+      <div class="pass-foot">Advisor meeting · Spring 2026 <a href="#crs" class="green">Board →</a></div>
+    </div>
+
+    <div class="pass">
+      <div class="pass-top"><div class="code c-orange">PLN-303</div><div class="gate">Gate<b>C2</b></div></div>
+      <div class="route orange"><span>YOU</span><div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><span>PLN</span></div>
+      <h3>Academic Planner</h3>
+      <p>Calendar, tasks, exams — all in one terminal</p>
+      <div class="pass-foot">Business class · May 2026 <a href="#pln" class="orange">Board →</a></div>
+    </div>
+
+    <div class="pass">
+      <div class="pass-top"><div class="code c-purple">PLN-404</div><div class="gate">Gate<b>D4</b></div></div>
+      <div class="route purple"><span>YOU</span><div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><span>RCM</span></div>
+      <h3>AP Recommender</h3>
+      <p>Pick the best AP curriculum for your future career</p>
+      <div class="pass-foot"> put smth fun here <a href="./ap-recommender.html" class="purple">Board →</a></div>
+    </div>
+
+  </div>
+
+  <!-- ===== ROADMAP ===== -->
+  <div class="section-title">FLIGHT ITINERARY — YOUR ACADEMIC ROADMAP</div>
+  <section class="roadmap">
+    <div class="roadmap-head">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+        Semester roadmap
+      </h2>
+      <small>3 of 6 stops completed</small>
+    </div>
+
+    <div class="stops">
+      <div class="stop done"><div class="dot">✓</div><b>Enrollment</b><span>Checked in</span></div>
+      <div class="stop done"><div class="dot">✓</div><b>Course pick</b><span>Gate B3</span></div>
+      <div class="stop done"><div class="dot">✓</div><b>Advisor mtg</b><span>Cleared</span></div>
+      <div class="stop now">
+        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 22h20"/><path d="M6.4 17.4 3 13.8l1.8-.9 3 1.5 3.5-1.8L6 7.5l2-1 7 3.3 4-2c1-.5 2.2-.2 2.6.7.4.9 0 2-1 2.5L8.4 17.3c-.6.3-1.4.3-2-.1z"/></svg></div>
+        <b>Midterms</b><span>In flight</span>
+      </div>
+      <div class="stop">
+        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <b>GPA review</b><span>Gate A1</span>
+      </div>
+      <div class="stop">
+        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0z"/></svg></div>
+        <b>Finals</b><span>Destination</span>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><small>Current GPA</small><div class="num blue">3.7</div><span>Dean's List</span></div>
+      <div class="stat"><small>Credits loaded</small><div class="num">18</div><span>This semester</span></div>
+      <div class="stat"><small>Tasks due</small><div class="num orange">5</div><span>Next 7 days</span></div>
+      <div class="stat"><small>Next exam</small><div class="num" style="color:var(--red)">D-7</div><span>Midterm · Math</span></div>
+    </div>
+  </section>
+
+</div><!-- /home -->
+
+  <!-- ===== GPA CALCULATOR ===== -->
+  <div id="gpa" class="view">
+    <button class="back">← Back to terminal</button>
+    <div class="panel">
+      <h2 class="blue">GPA Calculator · Gate A1</h2>
+      <p>Enter grades &amp; credits — see your GPA instantly</p>
+      <div class="result">Your GPA: <b id="gpaOut" class="blue">0.00</b></div>
+    </div>
+
+    <div class="dashboard">
+
+      <header class="top-bar">
+        <h3>MY COURSES <span class="count">6</span></h3> <!--get number of classes from db-->
+        <button class="btn" onclick="addGpaRow()">+ Add course</button>
+      </header>
+
+      <details class="classContainer" open>
+        <summary class="class-header">
+          <div class="class-info">
+            <span class="class-code">Major</span> <!--major/minor--> <!--get from db-->
+            <h2>AP Calculus BC</h2> <!--class name--> <!--get from db-->
+          </div>
+
+          <div class="class-stats">
+            <span>Credits: 3</span> <!--get from db-->
+            <span>Class Grade</span>
+            <strong>93.8%</strong> <!--get calculated number-->
+          </div>
+        </summary>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Works</th>
+              <th>Date</th>
+              <th>Assignment Type</th>
+              <th>Grade</th>
+            </tr>
+          </thead>
+
+          <tbody id="GradesBody">
+            <!--JavaScript will add items here-->
+          </tbody>
+        </table>
+
+        <div class="card-footer">
+          <button>+ Add Assignment</button> <!--link this button-->
+        </div>
+      </details>
+
+    </div>
+  </div>
+
+  <!-- ===== COURSE SELECTION ===== -->
+  <div id="crs" class="view">
+    <button class="back">← Back to terminal</button>
+    <div class="panel">
+      <h2 class="green">Course Selection · Gate B3</h2>
+      <p>Plan your semester — pick routes &amp; schedule</p>
+      <div class="row">
+        <input id="crsName" placeholder="Course name (e.g. AP Biology)">
+        <input id="crsCredit" type="number" placeholder="Credits" style="max-width:120px">
+        <button class="btn" style="background:var(--green)" onclick="addCourse()">Add</button>
+      </div>
+      <ul class="list" id="crsList"></ul>
+      <div class="result">Total credits: <b id="crsTotal" class="green">0</b></div>
+    </div>
+  </div>
+
+  <!-- ===== ACADEMIC PLANNER ===== -->
+  <div id="pln" class="view">
+    <button class="back">← Back to terminal</button>
+    <div class="panel">
+      <h2 class="orange">Academic Planner · Gate C2</h2>
+      <p>Calendar, tasks, exams — all in one terminal</p>
+      <div class="row">
+        <input id="plnTask" placeholder="Task or exam">
+        <input id="plnDate" type="date" style="max-width:180px">
+        <button class="btn" style="background:var(--orange)" onclick="addTask()">Add</button>
+      </div>
+      <ul class="list" id="plnList"></ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---- Navigation ----
+  function go(id) {
+    if (!document.getElementById(id)) id = 'home';
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', () => go(location.hash.slice(1) || 'home'));
+  document.querySelectorAll('.back').forEach(b => b.onclick = () => { location.hash = ''; go('home'); });
+  go(location.hash.slice(1) || 'home');
+
+  // ---- GPA Calculator ----
+  const grades = { 'A': 4, 'A-': 3.7, 'B+': 3.3, 'B': 3, 'B-': 2.7, 'C+': 2.3, 'C': 2, 'C-': 1.7, 'D': 1, 'F': 0 };
+  function addGpaRow() {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input placeholder="Course">
+      <select>${Object.keys(grades).map(g => `<option>${g}</option>`).join('')}</select>
+      <input type="number" value="1" min="0" style="max-width:100px">
+      <button class="btn del">✕</button>`;
+    row.querySelector('.del').onclick = () => { row.remove(); calcGpa(); };
+    row.oninput = calcGpa;
+    document.getElementById('gpaRows').appendChild(row);
+    calcGpa();
+  }
+  function calcGpa() {
+    let pts = 0, cr = 0;
+    document.querySelectorAll('#gpaRows .row').forEach(r => {
+      const c = parseFloat(r.querySelector('input[type=number]').value) || 0;
+      pts += grades[r.querySelector('select').value] * c;
+      cr += c;
+    });
+    document.getElementById('gpaOut').textContent = cr ? (pts / cr).toFixed(2) : '0.00';
+  }
+
+  //copied code
+  document.querySelector('.fullcourse').addEventListener('submit', async (event) => {
+    event.preventDefault(); //prevent form from reloading the page
+    
+    const username = document.getElementById('username').value;
+    const passcode = document.getElementById('passcode').value;
+
+    
+    const response = await fetch(`https://44.215.161.145/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username,
+        passcode: passcode
+      })
+    });
+
+    if (response.ok) { //if http response status is 200-299
+      const loginResult = await response.json();
+      if (loginResult === "false") { //if username/passcode is invalid
+        alert('Invalid username or passcode. Please try again.');
+      } else {
+        alert('Login Success.');
+        const name = loginResult[0].student_name; 
+        localStorage.setItem("user_name", name);
+        window.location.href = './academicair.html'; //redirect to the student home page
+        // // const destination = new URL('./academicair.html', window.location.href);
+        // // console.log('Redirecting to:', destination.href);
+        // window.location.href = destination.href;
+      } 
+    } else {
+      alert('Login request failed. Please try again.');
+    }
+  });
+  addGpaRow();
+
+  // ---- Course Selection ----
+  let courses = [];
+  function addCourse() {
+    const name = crsName.value.trim(), credit = parseFloat(crsCredit.value) || 0;
+    if (!name) return;
+    courses.push({ name, credit });
+    crsName.value = ''; crsCredit.value = '';
+    renderCourses();
+  }
+  function renderCourses() {
+    crsList.innerHTML = courses.map((c, i) =>
+      `<li><span>${c.name} · ${c.credit} cr</span><button class="btn del" onclick="courses.splice(${i},1);renderCourses()">✕</button></li>`).join('');
+    crsTotal.textContent = courses.reduce((s, c) => s + c.credit, 0);
+  }
+
+  // ---- Academic Planner ----
+  let tasks = [];
+  function addTask() {
+    const t = plnTask.value.trim();
+    if (!t) return;
+    tasks.push({ t, d: plnDate.value, done: false });
+    tasks.sort((a, b) => (a.d || '9') > (b.d || '9') ? 1 : -1);
+    plnTask.value = ''; plnDate.value = '';
+    renderTasks();
+  }
+  function renderTasks() {
+    plnList.innerHTML = tasks.map((x, i) =>
+      `<li class="${x.done ? 'done' : ''}">
+        <span onclick="tasks[${i}].done=!tasks[${i}].done;renderTasks()" style="cursor:pointer">${x.done ? '✓' : '○'} ${x.t}${x.d ? ' · ' + x.d : ''}</span>
+        <button class="btn del" onclick="tasks.splice(${i},1);renderTasks()">✕</button></li>`).join('');
+  }
+
+  <!--New stuff-->
+  async function loadAssignments() {
+    const tbody = document.getElementById("assignmentsBody");
+
+    try {
+      const response = await fetch(`https://44.215.161.145/courses`); 
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+
+      const courses = await response.json();
+
+
+
+      // Remove old rows before rendering the latest data
+      tbody.replaceChildren();
+
+      assignments.forEach(assignment => {
+        const row = document.createElement("tr");
+
+        const weightedGrade =
+          (assignment.grade * assignment.weight / 100).toFixed(2);
+
+        const values = [
+          assignment.name,
+          `${assignment.grade}%`,
+          assignment.date,
+          `${assignment.weight}%`,
+          `${weightedGrade}%`
+        ];
+
+        values.forEach((value, index) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+
+          if (index === 1 || index === 4) {
+            cell.classList.add("grade");
+          }
+
+          row.appendChild(cell);
+        });
+
+        // Create a delete button for this assignment
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => {
+          deleteAssignment(assignment.id);
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        tbody.appendChild(row);
+      });
+
+    } catch (error) {
+      console.error("Error loading assignments:", error);
+    }
+  }
+
+  // Load assignments when the page starts
+  loadAssignments();
+
+</script>
+</body>
+</html>
